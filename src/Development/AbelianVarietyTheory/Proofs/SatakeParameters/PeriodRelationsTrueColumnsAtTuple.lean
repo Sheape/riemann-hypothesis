@@ -148,9 +148,15 @@ theorem chainPeriodRelation_read_for_character_avoiding_primes (Dx : DivX D) (mu
     (h : IsTwist (recFields D).F (recFields D).E (recFields D).K S χ)
     (h' : IsTwist (recFields D).F (recFields D).E (recFields D).K (badS D) χ)
     (H : ChainTieS Ch sel Dx mu0 A u μ (@Subtype.mk _ (IsTwist _ _ _ S) χ h)) : ChainTie Ch sel Dx mu0 A u μ := by
-  obtain ⟨cst, I, hI, b, hY, hK, hF, hP, eM, jA, h1, h2, h3, h4, h5, h6⟩ := H
-  exact ⟨@Subtype.mk _ (IsTwist _ _ _ (badS D)) χ h', cst, I, { hI with }, b, ⟨hY.fin⟩, hK, hF, hP, eM, jA, h1,
-    ⟨h2.1, fun e => Subtype.ext (h2.2 e)⟩, h3, h4, h5, h6⟩
+  -- State the repackaging once for arbitrary sets `T T'` and a variable twist `ξ`: the kernel then compares `ξ`
+  -- with `⟨ξ, hξ⟩` instead of `⟨χ, h⟩` with `⟨χ, h'⟩`, whose types differ only deep inside `tupGrp S`/`tupGrp (badS D)`.
+  have key : ∀ (T T' : Set ℕ) (ξ : Tup (recFields D).F (recFields D).E (recFields D).K T)
+      (hξ : (ξ : Chr (recFields D).F (recFields D).E (recFields D).K) ∈ tupGrp _ _ _ T'),
+      ChainTieS Ch sel Dx mu0 A u μ ξ → ChainTieS Ch sel Dx mu0 A u μ (⟨ξ, hξ⟩ : Tup _ _ _ T') := by
+    rintro T T' ξ hξ ⟨cst, I, hI, b, hY, hK, hF, hP, eM, jA, h1, h2, h3, h4, h5, h6⟩
+    exact ⟨cst, I, { hI with }, b, ⟨hY.fin⟩, hK, hF, hP, eM, jA, h1, h2, h3, h4, h5, h6⟩
+  obtain ⟨cst, I, hI, b, hY, hK, hF, hP, eM, jA, h1, h2, h3, h4, h5, h6⟩ := key S (badS D) ⟨χ, h⟩ h' H
+  exact ⟨_, cst, I, hI, b, hY, hK, hF, hP, eM, jA, h1, ⟨h2.1, fun e => Subtype.ext (h2.2 e)⟩, h3, h4, h5, h6⟩
 
 theorem chainTie_of (Dx : DivX D) (mu0 : Fin D.R.m → Formalism.L2.Host.HChar D.host.E) (A : Amb (recFields D))
     (u : D.what₂.Word) (μ : D.what₂.Tup) {S : Set ℕ} (ξ : Tup (recFields D).F (recFields D).E (recFields D).K S)
