@@ -273,9 +273,14 @@ def ptAt (V : Type) [CommRing V] : Over.mk (𝟙 (Sp V)) ⟶ ptOver V V :=
 
 theorem one_left_at (V : Type) [CommRing V] (G : Over (Sp V)) [GrpObj G] :
     (1 : Over.mk (𝟙 (Sp V)) ⟶ G).left = (1 : ptOver V V ⟶ G).left := by
-  have h : ptAt V ≫ (1 : ptOver V V ⟶ G) = 1 := pre_one _
-  rw [← h, Over.comp_left]
-  exact Category.id_comp _
+  -- State the step for an arbitrary scheme `X` and `f : X ⟶ X`: the kernel then compares the variable `f`
+  -- with `𝟙 X` instead of unfolding `spMap (algebraMap V V)` against `𝟙 (Sp V)`.
+  have key : ∀ (X : Scheme) (f : X ⟶ X) (G' : Over X) [GrpObj G'] (p : Over.mk (𝟙 X) ⟶ Over.mk f),
+      p.left = 𝟙 _ → (1 : Over.mk (𝟙 X) ⟶ G').left = (1 : Over.mk f ⟶ G').left := by
+    intro X f G' _ p hp
+    rw [← pre_one p, Over.comp_left, hp]
+    exact Category.id_comp _
+  exact key _ _ G (ptAt V) rfl
 
 end Frames
 
